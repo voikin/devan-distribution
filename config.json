@@ -1,0 +1,15 @@
+{
+  "pg": {
+    "host": "localhost",
+    "port": "5432",
+    "username": "postgres",
+    "password": "postgres",
+    "dbname": "devan_distribution",
+    "ssl_mode": "disable"
+  },
+  "HTTP": {
+    "host": "localhost",
+    "port": "8000",
+    "shutdownServerTimeout": 15
+  }
+}
