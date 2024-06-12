@@ -17,5 +17,6 @@ func InitRoutes(server *gin.Engine, ctrl *Controller) {
 
 	api := server.Group("/api", ctrl.userIdentity)
 	{
+		api.POST("/orders")
 	}
 }

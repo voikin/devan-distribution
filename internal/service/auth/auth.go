@@ -5,10 +5,11 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/voikin/devan-distribution/internal/config"
 	"github.com/voikin/devan-distribution/internal/entity"
-	"time"
 )
 
 const (
@@ -34,7 +35,8 @@ func New(repo Repo, cfg *config.JWTConfig) *Service {
 
 type tokenClaims struct {
 	jwt.RegisteredClaims
-	UserId int `json:"user_id"`
+	UserId int      `json:"user_id"`
+	Roles  []string `json:"roles"`
 }
 
 func (s *Service) CreateUser(ctx context.Context, user entity.User) (int64, error) {
@@ -55,6 +57,7 @@ func (s *Service) GenerateToken(ctx context.Context, username, password string) 
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		user.Id,
+		user.Roles,
 	})
 
 	accessString, err := accessToken.SignedString([]byte(s.cfg.SigningKey))
@@ -69,6 +72,7 @@ func (s *Service) GenerateToken(ctx context.Context, username, password string) 
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		user.Id,
+		user.Roles,
 	})
 
 	refreshString, err := refreshToken.SignedString([]byte(s.cfg.SigningKey))
@@ -79,7 +83,7 @@ func (s *Service) GenerateToken(ctx context.Context, username, password string) 
 	return accessString, refreshString, nil
 }
 
-func (s *Service) ParseToken(accessToken string) (int, error) {
+func (s *Service) ParseToken(accessToken string) (int, []string, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -88,15 +92,15 @@ func (s *Service) ParseToken(accessToken string) (int, error) {
 		return []byte(s.cfg.SigningKey), nil
 	})
 	if err != nil {
-		return 0, err
+		return 0, nil, err
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return 0, errors.New("token claims are not of type *tokenClaims")
+		return 0, nil, errors.New("token claims are not of type *tokenClaims")
 	}
 
-	return claims.UserId, nil
+	return claims.UserId, claims.Roles, nil
 }
 
 func (s *Service) RefreshToken(refreshToken string) (string, error) {
@@ -124,6 +128,7 @@ func (s *Service) RefreshToken(refreshToken string) (string, error) {
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		claims.UserId,
+		claims.Roles,
 	})
 
 	accessString, err := accessToken.SignedString([]byte(s.cfg.SigningKey))
