@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/jackc/pgx/v5"
-	userRepo "github.com/voikin/devan-distribution/internal/repository/user"
+	userRepo "github.com/voikin/devan-distribution/internal/repository/auth"
 )
 
 type repositories struct {

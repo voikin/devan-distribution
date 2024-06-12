@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Pg   PGConfig
 	HTTP HTTPConfig
+	JWT  JWTConfig
 }
 
 type PGConfig struct {
@@ -25,6 +26,11 @@ type HTTPConfig struct {
 	Host                  string        `json:"host"`
 	Port                  string        `json:"port"`
 	ShutdownServerTimeout time.Duration `josn:"shutdownServerTimeout"`
+}
+
+type JWTConfig struct {
+	Salt       string `json:"salt"`
+	SigningKey string `json:"signingKey"`
 }
 
 func InitConfig() (*Config, error) {
@@ -47,6 +53,6 @@ func InitConfig() (*Config, error) {
 }
 
 func (c PGConfig) GetDSN() string {
-	return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+	return fmt.Sprintf("host=%s port=%s auth=%s dbname=%s password=%s sslmode=%s",
 		c.Host, c.Port, c.Username, c.DBName, c.Password, c.SSLMode)
 }

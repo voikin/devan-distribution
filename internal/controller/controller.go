@@ -1,9 +1,15 @@
 package controller
 
-import "context"
+import (
+	"github.com/voikin/devan-distribution/internal/entity"
+)
 
+// UseCase TODO are we really need this ?
 type UseCase interface {
-	CreateUser(ctx context.Context) error
+	CreateUser(input entity.User) (int64, error)
+	GenerateToken(username, password string) (string, string, error)
+	RefreshToken(refreshToken string) (string, error)
+	ParseToken(token string) (int, error)
 }
 
 type Controller struct {
