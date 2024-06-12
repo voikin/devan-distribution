@@ -2,10 +2,11 @@ package controller
 
 import (
 	"errors"
-	"github.com/voikin/devan-distribution/internal/entity"
-	"github.com/voikin/devan-distribution/internal/errs"
 	"net/http"
 	"time"
+
+	"github.com/voikin/devan-distribution/internal/entity"
+	"github.com/voikin/devan-distribution/internal/errs"
 
 	"github.com/gin-gonic/gin"
 )
@@ -68,8 +69,8 @@ func (c *Controller) signIn(ctx *gin.Context) {
 
 	accessToken, refreshToken, err := c.usecase.GenerateToken(input.Username, input.Password)
 	if err != nil {
-		var myErr *errs.ErrorNotFound
-		if errors.As(err, &myErr) {
+		var errNotFound *errs.ErrorNotFound
+		if errors.As(err, &errNotFound) {
 			errs.NewErrorResponse(ctx, http.StatusNotFound, err.Error())
 			return
 		}

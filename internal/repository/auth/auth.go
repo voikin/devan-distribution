@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/voikin/devan-distribution/internal/entity"
 	"github.com/voikin/devan-distribution/internal/errs"
@@ -19,25 +21,29 @@ func New(conn *pgx.Conn) *Repo {
 	}
 }
 
-func (r *Repo) CreateUser(ctx context.Context, user entity.User) (int64, error) {
-	var id int64
-	row := r.conn.QueryRow(ctx, createUserQuery, user.Username, user.Password)
-
-	if err := row.Scan(&id); err != nil {
-		return 0, err
-	}
-
-	return id, nil
-}
-
-func (r *Repo) GetUser(ctx context.Context, username, password string) (*entity.User, error) {
+func (r *Repo) GetUserByUsername(ctx context.Context, username string) (*entity.User, error) {
 	var user entity.User
-	// TODO: Change user properties if we need
-	err := r.conn.QueryRow(ctx, getUserQuery, username, password).Scan(&user.Username, &user.Password)
+	var roleId string
+	err := r.conn.QueryRow(ctx, getUserQuery, username).Scan(&user.ID, &user.Username, &user.Password, &roleId)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errs.NewErrorNotFound(username)
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (r *Repo) GetUserById(ctx context.Context, userId int64) (*entity.User, error) {
+	var user entity.User
+	err := r.conn.QueryRow(ctx, getUserQuery, userId).Scan(&user.ID, &user.Username, &user.Password, &user.Role)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// TODO: Fix This
+			return nil, errs.NewErrorNotFound(fmt.Sprintf("user with id: %d not found", userId))
 		}
 		return nil, err
 	}

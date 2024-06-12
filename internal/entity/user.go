@@ -1,9 +1,19 @@
 package entity
 
 type User struct {
-	Id int `json:"-" db:"id"`
-	//Name     string `json:"name" binding:"required"`
-	Username string   `json:"username" binding:"required"`
-	Password string   `json:"password" binding:"required"`
-	Roles    []string `json:"roles" binding:"required"`
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Role     Role   `json:"role"`
+}
+
+type Role struct {
+	ID          int64        `json:"id"`
+	Name        string       `json:"name"`
+	Permissions []Permission `json:"permissions"`
+}
+
+type Permission struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
