@@ -37,7 +37,7 @@ func (c *Controller) signUp(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, map[string]interface{}{
+	ctx.JSON(http.StatusOK, gin.H{
 		"id": id,
 	})
 }
@@ -87,7 +87,7 @@ func (c *Controller) signIn(ctx *gin.Context) {
 		Path:     "/",
 	})
 
-	ctx.JSON(http.StatusOK, map[string]interface{}{
+	ctx.JSON(http.StatusOK, gin.H{
 		"accessToken": accessToken,
 		// "refreshToken": refreshToken, // Удалите эту строку, если вы не хотите отправлять refresh token в JSON ответе
 	})
@@ -114,7 +114,7 @@ func (c *Controller) refreshToken(ctx *gin.Context) {
 	}
 
 	// Отправьте новый access токен обратно клиенту
-	ctx.JSON(http.StatusOK, map[string]string{
+	ctx.JSON(http.StatusOK, gin.H{
 		"accessToken": newAccessToken,
 	})
 }
@@ -141,7 +141,7 @@ func (c *Controller) logout(ctx *gin.Context) {
 		Path:     "/",
 	})
 
-	ctx.JSON(http.StatusOK, map[string]interface{}{
+	ctx.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
 }
