@@ -30,7 +30,7 @@ func (c *Controller) signUp(ctx *gin.Context) {
 		return
 	}
 
-	id, err := c.usecase.CreateUser(input)
+	id, err := c.usecase.CreateUser(ctx.Request.Context(), input)
 	if err != nil {
 		errs.NewErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return

@@ -7,6 +7,9 @@ import (
 
 type UserSevice interface {
 	CreateUser(ctx context.Context, input entity.User) (int64, error)
+	GenerateToken(username, password string) (string, string, error)
+	RefreshToken(refreshToken string) (string, error)
+	ParseToken(token string) (int, error)
 }
 
 type UseCase struct {
