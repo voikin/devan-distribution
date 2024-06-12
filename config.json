@@ -11,5 +11,9 @@
     "host": "localhost",
     "port": "8000",
     "shutdownServerTimeout": 15
+  },
+  "JWT":{
+    "salt" : "b2ee2620a71de50ef9731232ae7e860a240f6859b558c279035fe28e26cfed1f",
+    "signingKey" : "qrkjk#4#%35FSFJlja#4353KSFjH"
   }
 }
