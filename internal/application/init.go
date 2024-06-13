@@ -15,13 +15,12 @@ func initApp(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 
 	repository := createRepository(conn)
-	services := createService(repository)
+	services := createService(repository, cfg)
 	usecase := createUseCase(services)
-	controller := controller.New(usecase)
+	ctrl := controller.New(usecase)
 
 	ginEngine := gin.Default()
-
-	initRoutes(ginEngine, controller)
+	controller.InitRoutes(ginEngine, ctrl)
 
 	return &App{
 		config:  cfg,

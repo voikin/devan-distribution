@@ -1,6 +1,7 @@
 package application
 
 import (
+	"github.com/voikin/devan-distribution/internal/config"
 	userServicePkg "github.com/voikin/devan-distribution/internal/service/user"
 )
 
@@ -8,8 +9,8 @@ type services struct {
 	userService *userServicePkg.Service
 }
 
-func createService(repositories *repositories) *services {
+func createService(repositories *repositories, cfg *config.Config) *services {
 	return &services{
-		userService: userServicePkg.New(repositories.userRepository),
+		userService: userServicePkg.New(repositories.userRepository, &cfg.JWT),
 	}
 }
