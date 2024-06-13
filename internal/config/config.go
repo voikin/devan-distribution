@@ -29,8 +29,10 @@ type HTTPConfig struct {
 }
 
 type JWTConfig struct {
-	Salt       string `json:"salt"`
-	SigningKey string `json:"signingKey"`
+	Salt            string        `json:"salt"`
+	SigningKey      string        `json:"signingKey"`
+	AccessTokenTTL  time.Duration `json:"tokenTTL"`
+	RefreshTokenTTL time.Duration `json:"refreshTokenTTL"`
 }
 
 func InitConfig() (*Config, error) {

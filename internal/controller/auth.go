@@ -2,10 +2,10 @@ package controller
 
 import (
 	"errors"
+	"github.com/voikin/devan-distribution/internal/DTO"
 	"net/http"
 	"time"
 
-	"github.com/voikin/devan-distribution/internal/entity"
 	"github.com/voikin/devan-distribution/internal/errs"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,7 @@ import (
 // @Failure default {object} errs.errorResponse
 // @Router /auth/sign-up [post]
 func (c *Controller) signUp(ctx *gin.Context) {
-	var input entity.User
+	var input DTO.CreateUser
 
 	if err := ctx.BindJSON(&input); err != nil {
 		errs.NewErrorResponse(ctx, http.StatusBadRequest, "invalid input body")
@@ -67,7 +67,7 @@ func (c *Controller) signIn(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := c.usecase.GenerateToken(input.Username, input.Password)
+	accessToken, refreshToken, err := c.usecase.GenerateToken(ctx.Request.Context(), input.Username, input.Password)
 	if err != nil {
 		var errNotFound *errs.ErrorNotFound
 		if errors.As(err, &errNotFound) {
@@ -89,7 +89,7 @@ func (c *Controller) signIn(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"accessToken": accessToken,
-		// "refreshToken": refreshToken, // Удалите эту строку, если вы не хотите отправлять refresh token в JSON ответе
+		"role":        "admin", //TODO: think about it
 	})
 }
 
@@ -107,11 +107,19 @@ func (c *Controller) refreshToken(ctx *gin.Context) {
 	}
 
 	// Используйте новый метод RefreshToken для обновления access токена
-	newAccessToken, err := c.usecase.RefreshToken(refreshToken)
+	newAccessToken, newRefreshToken, err := c.usecase.RefreshToken(ctx.Request.Context(), refreshToken)
 	if err != nil {
 		errs.NewErrorResponse(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
+
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "refreshToken",
+		Value:    newRefreshToken,
+		HttpOnly: true,
+		Secure:   true, // использовать только при передаче через HTTPS
+		Path:     "/",
+	})
 
 	// Отправьте новый access токен обратно клиенту
 	ctx.JSON(http.StatusOK, gin.H{
@@ -143,5 +151,28 @@ func (c *Controller) logout(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "ok",
+	})
+}
+
+// @Summary Roles
+// @Tags auth
+// @Description Get all roles
+// @ID roles
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} DTO.Role
+// @Failure 400,404 {object} errs.errorResponse
+// @Failure 500 {object} errs.errorResponse
+// @Failure default {object} errs.errorResponse
+// @Router /auth/roles [get]
+func (c *Controller) roles(ctx *gin.Context) {
+	roles, err := c.usecase.GetRoles(ctx)
+	if err != nil {
+		errs.NewErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"roles": roles,
 	})
 }

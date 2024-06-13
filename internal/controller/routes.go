@@ -13,6 +13,7 @@ func InitRoutes(server *gin.Engine, ctrl *Controller) {
 		auth.POST("/sign-in", ctrl.signIn)
 		auth.GET("/refresh", ctrl.refreshToken)
 		auth.POST("/logout", ctrl.logout)
+		auth.GET("/roles", ctrl.roles)
 	}
 
 	api := server.Group("/api", ctrl.userIdentity)

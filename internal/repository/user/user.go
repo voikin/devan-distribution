@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/voikin/devan-distribution/internal/DTO"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/voikin/devan-distribution/internal/entity"
@@ -17,12 +18,12 @@ func New(conn *pgx.Conn) *Repo {
 	}
 }
 
-func (r *Repo) CreateUser(ctx context.Context, user entity.User) (int64, error) {
+func (r *Repo) CreateUser(ctx context.Context, user DTO.CreateUser) (int64, error) {
 	var id int64
-	row := r.conn.QueryRow(ctx, createUserQuery, user.Username, user.Password, user.Role.ID)
+	row := r.conn.QueryRow(ctx, createUserQuery, user.Username, user.Password, user.RoleID)
 
 	if err := row.Scan(&id); err != nil {
-		return 0, err
+		return -1, err
 	}
 
 	return id, nil
@@ -122,4 +123,29 @@ func (r *Repo) DeleteUser(ctx context.Context, userId int64) (bool, error) {
 	}
 
 	return commandTag.RowsAffected() > 0, nil
+}
+
+func (r *Repo) GetRoles(ctx context.Context) ([]DTO.Role, error) {
+	var roles []DTO.Role
+
+	rows, err := r.conn.Query(ctx, selectRolesSQL)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var role DTO.Role
+		if err := rows.Scan(&role.ID, &role.Name); err != nil {
+			return nil, err
+		}
+		roles = append(roles, role)
+	}
+
+	// Обработка ошибки, если возникла на каком-то этапе обработки результатов запроса
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return roles, nil
 }

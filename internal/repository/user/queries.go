@@ -18,4 +18,5 @@ const (
 		WHERE u.id = $1`
 	updateUserQuery = `UPDATE users SET username=$1, password_hash=$2, role_id=$3 WHERE id=$4`
 	deleteUserQuery = `DELETE FROM users WHERE id=$1`
+	selectRolesSQL  = `SELECT id, name FROM roles;`
 )

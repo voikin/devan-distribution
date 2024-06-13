@@ -2,15 +2,17 @@ package controller
 
 import (
 	"context"
+	"github.com/voikin/devan-distribution/internal/DTO"
 	"github.com/voikin/devan-distribution/internal/entity"
 )
 
 // UseCase TODO are we really need this ?
 type UseCase interface {
-	CreateUser(ctx context.Context, input entity.User) (int64, error)
-	GenerateToken(username, password string) (string, string, error)
-	RefreshToken(refreshToken string) (string, error)
-	ParseToken(token string) (int, error)
+	CreateUser(ctx context.Context, input DTO.CreateUser) (int64, error)
+	GenerateToken(ctx context.Context, username, password string) (string, string, error)
+	RefreshToken(ctx context.Context, refreshToken string) (string, string, error)
+	VerifyToken(ctx context.Context, accessToken string) (*entity.User, error)
+	GetRoles(ctx context.Context) ([]DTO.Role, error)
 }
 
 type Controller struct {

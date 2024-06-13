@@ -2,17 +2,17 @@ package usecase
 
 import (
 	"context"
-
+	"github.com/voikin/devan-distribution/internal/DTO"
 	"github.com/voikin/devan-distribution/internal/config"
 	"github.com/voikin/devan-distribution/internal/entity"
 )
 
 type UserService interface {
-	CreateUser(ctx context.Context, user entity.User) (int64, error)
-	GetUserByUsername(ctx context.Context, username string) (*entity.User, error)
-	GetUserByID(ctx context.Context, userId int64) (*entity.User, error)
-	UpdateUser(ctx context.Context, user entity.User) (bool, error)
-	DeleteUser(ctx context.Context, userId int64) (bool, error)
+	CreateUser(ctx context.Context, user DTO.CreateUser) (int64, error)
+	GetUserByUsernameWithPassCheck(ctx context.Context, username string, password string) (*entity.User, error)
+	GenerateTokens(ctx context.Context, user *entity.User) (string, string, error)
+	GetUserByTokenWithCheck(ctx context.Context, token string) (*entity.User, error)
+	GetRoles(ctx context.Context) ([]DTO.Role, error)
 }
 
 type UseCase struct {
@@ -23,5 +23,6 @@ type UseCase struct {
 func New(cfg config.Config, userService UserService) *UseCase {
 	return &UseCase{
 		userService: userService,
+		cfg:         cfg,
 	}
 }

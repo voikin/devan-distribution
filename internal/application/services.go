@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/voikin/devan-distribution/internal/config"
-	userServicePkg "github.com/voikin/devan-distribution/internal/service/auth"
+	userServicePkg "github.com/voikin/devan-distribution/internal/service/user"
 )
 
 type services struct {

@@ -9,7 +9,7 @@ import (
 
 const (
 	authorizationHeader = "Authorization"
-	userCtx             = "userId"
+	userCtx             = "user"
 )
 
 func (c *Controller) userIdentity(ctx *gin.Context) {
@@ -30,11 +30,11 @@ func (c *Controller) userIdentity(ctx *gin.Context) {
 		return
 	}
 
-	userId, err := c.usecase.ParseToken(headerParts[1])
+	user, err := c.usecase.VerifyToken(ctx.Request.Context(), headerParts[1])
 	if err != nil {
 		errs.NewErrorResponse(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	ctx.Set(userCtx, userId)
+	ctx.Set(userCtx, user)
 }
